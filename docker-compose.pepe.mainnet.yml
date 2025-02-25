@@ -1,0 +1,83 @@
+version: "3"
+
+services:
+  btcpayserver:
+    restart: unless-stopped
+    container_name: btcpayserver
+    image: pepeenthusiast/btcpayserver:latest
+    ports:
+      - 49392:49392
+    environment:
+      BTCPAY_CHAINS: "pepe"
+      BTCPAY_PEPEEXPLORERURL: http://nbxplorer:32834/
+      BTCPAY_POSTGRES: User ID=postgres;Host=postgres;Port=5432;Application Name=btcpayserver;Database=btcpayserver${NBITCOIN_NETWORK:-mainnet}
+      BTCPAY_EXPLORERPOSTGRES: User ID=postgres;Host=postgres;Port=5432;Application Name=btcpayserver;MaxPoolSize=80;Database=nbxplorer${NBITCOIN_NETWORK:-mainnet}
+      BTCPAY_NETWORK: ${NBITCOIN_NETWORK:-mainnet}
+      BTCPAY_BIND: 0.0.0.0:49392
+      BTCPAY_ROOTPATH: ${BTCPAY_ROOTPATH:-/}
+      BTCPAY_DEBUGLOG: btcpay.log
+      BTCPAY_DOCKERDEPLOYMENT: "true"
+    labels:
+      traefik.enable: "false"
+    links:
+      - postgres
+    volumes:
+      - "btcpay_datadir:/datadir"
+      - "nbxplorer_datadir:/root/.nbxplorer"
+      - "btcpay_pluginsdir:/root/.btcpayserver/Plugins"
+
+  nbxplorer:
+    restart: unless-stopped
+    container_name: btcpay_nbxplorer
+    image: pepeenthusiast/nbxplorer:latest
+    ports:
+      - 32834:32834
+    environment:
+      NBXPLORER_NETWORK: ${NBITCOIN_NETWORK:-mainnet}
+      NBXPLORER_BIND: 0.0.0.0:32834
+      NBXPLORER_NOAUTH: 1
+      NBXPLORER_CHAINS: "pepe"
+      NBXPLORER_POSTGRES: "User ID=postgres;Host=postgres;Port=5432;Database=nbxplorer${NBITCOIN_NETWORK:-mainnet}"
+      NBXPLORER_PEPENODEENDPOINT: pepecoind:33874
+      NBXPLORER_PEPERPCURL: http://pepecoind:33873/
+      NBXPLORER_PEPERPCUSER: rpc
+      NBXPLORER_PEPERPCPASSWORD: rpcp
+    volumes:
+      - "nbxplorer_datadir:/datadir"
+      - "pepecoin_datadir:/root/.pepecoin"
+
+  pepecoind:
+    restart: unless-stopped
+    container_name: btcpay_pepecoind
+    image: pepeenthusiast/pepecoin-core:1.1.0
+    command: |
+      -printtoconsole
+      -server=1
+      -dbcache=50
+      -port=33874
+      -rpcport=33873
+      -rpcuser=rpc
+      -rpcpassword=rpcp
+      -whitelist=0.0.0.0/0
+      -rpcallowip=0.0.0.0/0
+    ports:
+      - "33874:33874"
+      - "33873:33873"
+    volumes:
+      - "pepecoin_datadir:/home/pepecoin/.pepecoin"
+
+  postgres:
+    restart: unless-stopped
+    image: postgres:13
+    container_name: btcpay_postgres
+    command: [ "-c", "random_page_cost=1.0", "-c", "shared_preload_libraries=pg_stat_statements" ]
+    environment:
+      POSTGRES_HOST_AUTH_METHOD: trust
+    ports:
+      - "5432:5432"
+
+volumes:
+  btcpay_datadir:
+  btcpay_pluginsdir:
+  nbxplorer_datadir:
+  pepecoin_datadir:
