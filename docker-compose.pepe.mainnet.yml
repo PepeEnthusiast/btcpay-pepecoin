@@ -8,8 +8,8 @@ services:
     ports:
       - 49392:49392
     environment:
-      BTCPAY_CHAINS: "pepe"
-      BTCPAY_PEPEEXPLORERURL: http://nbxplorer:32834/
+      BTCPAY_CHAINS: "pep"
+      BTCPAY_PEPEXPLORERURL: http://nbxplorer:32834/
       BTCPAY_POSTGRES: User ID=postgres;Host=postgres;Port=5432;Application Name=btcpayserver;Database=btcpayserver${NBITCOIN_NETWORK:-mainnet}
       BTCPAY_EXPLORERPOSTGRES: User ID=postgres;Host=postgres;Port=5432;Application Name=btcpayserver;MaxPoolSize=80;Database=nbxplorer${NBITCOIN_NETWORK:-mainnet}
       BTCPAY_NETWORK: ${NBITCOIN_NETWORK:-mainnet}
@@ -36,12 +36,12 @@ services:
       NBXPLORER_NETWORK: ${NBITCOIN_NETWORK:-mainnet}
       NBXPLORER_BIND: 0.0.0.0:32834
       NBXPLORER_NOAUTH: 1
-      NBXPLORER_CHAINS: "pepe"
+      NBXPLORER_CHAINS: "pep"
       NBXPLORER_POSTGRES: "User ID=postgres;Host=postgres;Port=5432;Database=nbxplorer${NBITCOIN_NETWORK:-mainnet}"
-      NBXPLORER_PEPENODEENDPOINT: pepecoind:33874
-      NBXPLORER_PEPERPCURL: http://pepecoind:33873/
-      NBXPLORER_PEPERPCUSER: rpc
-      NBXPLORER_PEPERPCPASSWORD: rpcp
+      NBXPLORER_PEPNODEENDPOINT: pepecoind:33874
+      NBXPLORER_PEPRPCURL: http://pepecoind:33873/
+      NBXPLORER_PEPRPCUSER: rpc
+      NBXPLORER_PEPRPCPASSWORD: rpcp
     volumes:
       - "nbxplorer_datadir:/datadir"
       - "pepecoin_datadir:/root/.pepecoin"
